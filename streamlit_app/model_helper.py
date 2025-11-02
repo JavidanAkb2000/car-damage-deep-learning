@@ -1,4 +1,5 @@
 import torch
+import os
 from PIL import Image
 from torch import nn
 from torchvision import models, transforms
@@ -39,7 +40,15 @@ def predict(image_path):
 
     if trained_model is None:
         trained_model = CarClassifierResNet()
-        trained_model.load_state_dict(torch.load("model/saved_model.pth"))
+        
+        # Get the directory where this file is located
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        model_path = os.path.join(current_dir, "model", "saved_model.pth")
+        
+        # Load model (map to CPU for Streamlit Cloud)
+        trained_model.load_state_dict(
+            torch.load(model_path, map_location=torch.device('cpu'))
+        )
         trained_model.eval()
 
     with torch.no_grad():
